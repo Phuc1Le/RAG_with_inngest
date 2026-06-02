@@ -1,13 +1,13 @@
-from openai import OpenAI
+from sentence_transformers import SentenceTransformer
 from llama_index.readers.file import PDFReader
 from llama_index.core.node_parser import SentenceSplitter
 from dotenv import load_dotenv
+
 load_dotenv()
-client = OpenAI()
+embedder = SentenceTransformer("all-MiniLM-L6-v2")
 
 # Read PDF, split sentences, embed, and store in vector DB
-EMBED_MODEL = "text-embedding-3-large"
-EMBED_DIM = 3072
+EMBED_DIM = 384
 
 splitter = SentenceSplitter(chunk_size=1000, chunk_overlap=200)
 
@@ -20,8 +20,4 @@ def load_and_chunk_pdf(path: str):
     return chunks
 
 def embed_texts(texts: list[str]) -> list[list[float]]:
-    response = client.embeddings.create(
-        input=texts,
-        model=EMBED_MODEL
-    )
-    return [e.embedding for e in response.data]
+    return embedder.encode(texts, convert_to_numpy=False, show_progress_bar=False)
