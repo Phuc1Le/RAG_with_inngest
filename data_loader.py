@@ -20,4 +20,11 @@ def load_and_chunk_pdf(path: str):
     return chunks
 
 def embed_texts(texts: list[str]) -> list[list[float]]:
-    return embedder.encode(texts, convert_to_numpy=False, show_progress_bar=False)
+    embeddings = embedder.encode(texts, convert_to_numpy=False, show_progress_bar=False)
+    normalized = []
+    for vec in embeddings:
+        if hasattr(vec, "tolist"):
+            normalized.append(vec.tolist())
+        else:
+            normalized.append(list(vec))
+    return normalized

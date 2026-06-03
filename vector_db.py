@@ -15,15 +15,17 @@ class QdrantStorage:
         self.client.upsert(self.collection, points=points)
     
     def search(self, query_vector, top_k=5):
-        results = self.client.search(
+        if hasattr(query_vector, "tolist"):
+            query_vector = query_vector.tolist()
+        results = self.client.query_points(
             collection_name=self.collection,
-            query_vector=query_vector,
+            query=query_vector,
             with_payload=True,
             limit=top_k
         )
         contexts = []
         sources = set()
-        for r in results:
+        for r in results.points:
             payload = getattr(r, 'payload', None) or {}
             text = payload.get('text', '')
             source = payload.get('source', '')
