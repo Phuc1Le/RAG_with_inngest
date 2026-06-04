@@ -10,3 +10,6 @@ wheels/
 .venv
 
 .env
+
+# Vector database (local, regenerable)
+qdrant_storage/
