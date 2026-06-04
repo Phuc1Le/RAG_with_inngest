@@ -7,6 +7,7 @@ import uuid
 import os
 import datetime
 from inngest.experimental import ai
+from groq import Groq
 from data_loader import load_and_chunk_pdf, embed_texts
 from vector_db import QdrantStorage
 from custom_type import RAGQueryResult, RAGChunkAndSrc, RAGUpsertResult, RAGSearchResult
@@ -63,24 +64,18 @@ async def rag_query_pdf_ai(ctx: inngest.Context):
             "Answer concisely based on the context. If the context does not contain the answer, say you don't know."
         )
     }
-    adapter = ai.openai.Adapter(
-        auth_key=os.getenv("OPENAI_API_KEY"),
-        model="gpt-4o-mini"
-    )
-    res = await ctx.step.ai.infer(
-        "llm-answer",
-        adapter=adapter,
-        body={
-            "max_tokens": 500,
-            "temperature": 0.2,
-            "messages": [
-                {"role": "system", "content": "You are an assistant for answering questions based on provided context."},
-                {"role": "user", "content": user_content["content"]}
-            ]
-        }
+    client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+    res = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        max_tokens=500,
+        temperature=0.0,
+        messages=[
+            {"role": "system", "content": "You are an assistant for answering questions based on provided context."},
+            {"role": "user", "content": user_content["content"]}
+        ]
     )
 
-    answer = res["choices"][0]["message"]["content"].strip()
+    answer = res.choices[0].message.content.strip()
     return {"answer": answer, "sources": result.sources, "num_contexts": len(result.contexts)}
 app = FastAPI()
 
