@@ -64,6 +64,7 @@ async def rag_query_pdf_ai(ctx: inngest.Context):
             "Answer concisely based on the context. If the context does not contain the answer, say you don't know."
         )
     }
+    
     client = Groq(api_key=os.getenv("GROQ_API_KEY"))
     res = client.chat.completions.create(
         model="llama-3.3-70b-versatile",

@@ -16,22 +16,16 @@ def clean_text(text: str) -> str:
     """Clean research paper text by removing metadata and artifacts"""
     # Remove arXiv metadata lines
     text = re.sub(r'arXiv:\d+\.\d+.*\[.*\]\s*\d+.*', '', text)
-    
     # Remove "Published at" conference lines
     text = re.sub(r'Published at.*\d{4}', '', text)
-    
     # Remove page numbers (single/double digits at line boundaries)
     text = re.sub(r'^\s*\d{1,3}\s*$', '', text, flags=re.MULTILINE)
-    
     # Remove figure/table references and captions (Figure 1:, Table 1:, etc.)
     text = re.sub(r'(Figure|Table|Fig\.|Tbl\.)\s*\d+[:\-].*?(?=\n\n|\n(?=[A-Z])|$)', '', text, flags=re.IGNORECASE | re.DOTALL)
-    
     # Remove image/placeholder markers
     text = re.sub(r'\[.*?(?:image|figure|picture|photo|diagram|chart|plot|graph).*?\]', '', text, flags=re.IGNORECASE)
-    
     # Normalize whitespace (collapse multiple spaces/newlines)
     text = re.sub(r'\s+', ' ', text).strip()
-    
     return text
 
 def load_and_chunk_pdf(path: str):
